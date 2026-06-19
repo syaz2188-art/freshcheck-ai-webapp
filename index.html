@@ -1,130 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FreshCheck AI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FreshCheck AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
 
-    <style>
-        body{
-            font-family: Arial, sans-serif;
-            background:#f4f8f4;
-            text-align:center;
-            padding:20px;
-        }
-
-        .card{
-            max-width:600px;
-            margin:auto;
-            background:white;
-            padding:25px;
-            border-radius:15px;
-            box-shadow:0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        button{
-            background:#10B981;
-            color:white;
-            border:none;
-            padding:12px 20px;
-            border-radius:10px;
-            cursor:pointer;
-            font-size:16px;
-        }
-
-        img{
-            max-width:100%;
-            margin-top:20px;
-            border-radius:10px;
-        }
-
-        #result{
-            margin-top:20px;
-            font-size:20px;
-            font-weight:bold;
-        }
-    </style>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f8f4; text-align:center; padding:20px; }
+    .card { max-width:600px; margin:auto; background:white; padding:25px; border-radius:15px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+    button { background:#10B981; color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; font-size:16px; }
+    img { max-width:100%; margin-top:20px; border-radius:10px; display:none; }
+    #result { margin-top:20px; font-size:20px; font-weight:bold; }
+    #status { color:#555; margin:15px; }
+  </style>
 </head>
 
 <body>
-
-<div class="card">
-
+  <div class="card">
     <h1>FreshCheck AI</h1>
-
     <p>Upload a photo of the pH indicator sticker.</p>
 
-    <input type="file" id="imageUpload" accept="image/*">
+    <div id="status">Loading AI model...</div>
 
+    <input type="file" id="imageUpload" accept="image/*">
     <br><br>
 
     <button onclick="predict()">Analyse Image</button>
 
     <br>
-
-    <img id="preview"/>
-
+    <img id="preview">
     <div id="result"></div>
-
-</div>
+  </div>
 
 <script>
-
 const URL = "https://teachablemachine.withgoogle.com/models/-g_8tWKM4/";
-
 let model;
+let imageReady = false;
 
 async function loadModel() {
-
-    model = await tmImage.load(
-        URL + "model.json",
-        URL + "metadata.json"
-    );
-
-    console.log("Model loaded");
+  try {
+    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+    document.getElementById("status").innerHTML = "AI model loaded. Please upload an image.";
+  } catch (error) {
+    document.getElementById("status").innerHTML = "Model loading failed: " + error.message;
+  }
 }
 
 loadModel();
 
-document.getElementById("imageUpload")
-.addEventListener("change", function(event){
+document.getElementById("imageUpload").addEventListener("change", function(event) {
+  const file = event.target.files[0];
 
-    const file = event.target.files[0];
+  if (!file) {
+    document.getElementById("status").innerHTML = "No image selected.";
+    return;
+  }
 
-    if(!file) return;
+  const reader = new FileReader();
 
-    const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById("preview");
+    preview.src = e.target.result;
+    preview.style.display = "block";
+    imageReady = true;
+    document.getElementById("status").innerHTML = "Image uploaded. Click Analyse Image.";
+    document.getElementById("result").innerHTML = "";
+  };
 
-    reader.onload = function(e){
-        document.getElementById("preview").src = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
+  reader.readAsDataURL(file);
 });
 
-async function predict(){
+async function predict() {
+  try {
+    if (!model) {
+      document.getElementById("status").innerHTML = "Please wait. AI model is still loading.";
+      return;
+    }
+
+    if (!imageReady) {
+      document.getElementById("status").innerHTML = "Please upload an image first.";
+      return;
+    }
+
+    document.getElementById("status").innerHTML = "Analysing image...";
 
     const image = document.getElementById("preview");
-
     const prediction = await model.predict(image);
 
-    prediction.sort(
-        (a,b)=>b.probability-a.probability
-    );
+    prediction.sort((a, b) => b.probability - a.probability);
 
     const best = prediction[0];
+    const confidence = Math.round(best.probability * 100);
+
+    document.getElementById("status").innerHTML = "Analysis complete.";
 
     document.getElementById("result").innerHTML =
-        "Status: " +
-        best.className +
-        "<br>Confidence: " +
-        Math.round(best.probability*100) +
-        "%";
+      "Status: " + best.className +
+      "<br>Confidence: " + confidence + "%";
+  } catch (error) {
+    document.getElementById("status").innerHTML = "Prediction error: " + error.message;
+  }
 }
-
 </script>
-
 </body>
 </html>
