@@ -4,8 +4,8 @@
   <title>FreshCheck AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
   <style>
     body { font-family: Arial, sans-serif; background:#f4f8f4; text-align:center; padding:20px; }
@@ -90,7 +90,7 @@ async function predict() {
     const image = document.getElementById("preview");
     const prediction = await model.predict(image);
 
-    .sort((a, b) => b.probability - a.probability);
+    prediction.sort((a, b) => b.probability - a.probability);
 
     const best = prediction[0];
 const confidence = Math.round(best.probability * 100);
