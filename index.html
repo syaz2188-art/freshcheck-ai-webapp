@@ -90,16 +90,53 @@ async function predict() {
     const image = document.getElementById("preview");
     const prediction = await model.predict(image);
 
-    prediction.sort((a, b) => b.probability - a.probability);
+    .sort((a, b) => b.probability - a.probability);
 
     const best = prediction[0];
-    const confidence = Math.round(best.probability * 100);
+const confidence = Math.round(best.probability * 100);
 
-    document.getElementById("status").innerHTML = "Analysis complete.";
+let shelfLife = "";
+let recommendation = "";
+let statusColor = "";
 
-    document.getElementById("result").innerHTML =
-      "Status: " + best.className +
-      "<br>Confidence: " + confidence + "%";
+if (best.className === "Fresh") {
+  shelfLife = "48 Hours";
+  recommendation = "Safe to consume. Keep refrigerated.";
+  statusColor = "green";
+}
+
+if (best.className === "Consume Soon") {
+  shelfLife = "24 Hours";
+  recommendation = "Consume or cook within 24 hours.";
+  statusColor = "orange";
+}
+
+if (best.className === "Spoiled") {
+  shelfLife = "Expired";
+  recommendation = "Do not consume. Dispose immediately.";
+  statusColor = "red";
+}
+
+document.getElementById("status").innerHTML = "Analysis complete.";
+
+document.getElementById("result").innerHTML =
+  "<h2 style='color:" + statusColor + ";'>" +
+  best.className.toUpperCase() +
+  "</h2>" +
+
+  "<b>AI Confidence:</b> " +
+  confidence +
+  "%<br><br>" +
+
+  "<b>Estimated Shelf Life:</b><br>" +
+  shelfLife +
+  "<br><br>" +
+
+  "<b>Recommendation:</b><br>" +
+  recommendation +
+  "<br><br>" +
+
+  "<small><i>AI Confidence indicates how closely the uploaded image matches the patterns learned during training.</i></small>";
   } catch (error) {
     document.getElementById("status").innerHTML = "Prediction error: " + error.message;
   }
