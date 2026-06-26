@@ -99,17 +99,17 @@ let recommendation = "";
 let statusColor = "";
 
 if (best.className === "Fresh") {
-  recommendation = "Safe to consume. Keep refrigerated.";
+  recommendation = "Best consumed while fresh. Keep refrigerated to maintain quality.";
   statusColor = "green";
 }
 
 if (best.className === "Consume Soon") {
-  recommendation = "Consume or cook soon.";
+  recommendation = "Best consumed as soon as possible. Keep refrigerated and avoid extended storage.";
   statusColor = "orange";
 }
 
 if (best.className === "Spoiled") {
-  recommendation = "Do not consume. Dispose immediately.";
+  recommendation = "Not suitable for consumption. Dispose of the product immediately.";
   statusColor = "red";
 }
 
