@@ -42,7 +42,7 @@ let imageReady = false;
 async function loadModel() {
   try {
     model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-    document.getElementById("status").innerHTML = "AI model loaded. Please upload an image.";
+    document.getElementById("status").innerHTML = "AI model loaded.. Please upload an image.";
   } catch (error) {
     document.getElementById("status").innerHTML = "Model loading failed: " + error.message;
   }
