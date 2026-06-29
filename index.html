@@ -20,7 +20,7 @@
 <body>
   <div class="card">
     <h1>FreshCheck AI</h1>
-    <p>Upload a photo of the pH indicator sticker.</p>
+    <p>Upload_ a photo of the pH indicator sticker.</p>
 
     <div id="status">Loading AI model....</div>
 
@@ -42,7 +42,7 @@ let imageReady = false;
 async function loadModel() {
   try {
     model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-    document.getElementById("status").innerHTML = "AI model loaded.. Please upload an image.";
+    document.getElementById("status").innerHTML = "AI model loaded. Please upload an image.";
   } catch (error) {
     document.getElementById("status").innerHTML = "Model loading failed: " + error.message;
   }
